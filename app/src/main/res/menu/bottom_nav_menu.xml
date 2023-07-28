@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_proxy"
+        android:icon="@drawable/ic_proxy"
+        android:title="@string/title_proxy" />
+
+    <item
+        android:id="@+id/navigation_frida"
+        android:icon="@drawable/ic_debugging"
+        android:title="@string/title_frida" />
+
+    <item
+        android:id="@+id/navigation_shared_pref"
+        android:icon="@drawable/ic_storage"
+        android:title="@string/title_shared_pref" />
+
+</menu>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_proxy">
+
+    <fragment
+        android:id="@+id/navigation_proxy"
+        android:name="cc.ggez.ezhz.ui.proxy.ProxyFragment"
+        android:label="@string/title_proxy" />
+
+    <fragment
+        android:id="@+id/navigation_frida"
+        android:name="cc.ggez.ezhz.ui.frida.FridaFragment"
+        android:label="@string/title_frida"
+        tools:layout="@layout/fragment_frida" />
+
+    <fragment
+        android:id="@+id/navigation_shared_pref"
+        android:name="cc.ggez.ezhz.ui.sharedpref.SharedPrefFragment"
+        android:label="@string/title_shared_pref"
+        tools:layout="@layout/fragment_shared_pref" />
+</navigation>

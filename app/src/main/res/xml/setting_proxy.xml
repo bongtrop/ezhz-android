@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:fragment="cc.ggez.ezhz.ui.proxy.ProxyFragment">
+
+    <SwitchPreferenceCompat
+        app:key="proxy_switch"
+        app:iconSpaceReserved="false"
+        app:summary="Enable / Disable proxy"
+        app:title="Proxy Switch" />
+
+
+
+    <PreferenceCategory
+        app:key="proxy_settings"
+        app:iconSpaceReserved="false"
+        app:title="Proxy Settings">
+
+        <CheckBoxPreference
+            app:key="proxy_auto"
+            app:iconSpaceReserved="false"
+            app:summary="Get proxy settings from the PAC file automatically"
+            app:title="Auto Setting" />
+
+        <EditTextPreference
+            app:key="proxy_pac_url"
+            app:summary="The URL of your PAC file"
+            app:iconSpaceReserved="false"
+            app:title="PAC URL" />
+
+        <EditTextPreference
+            app:key="proxy_host"
+            app:summary="The host name of your proxy server"
+            app:iconSpaceReserved="false"
+            app:title="Host" />
+
+        <EditTextPreference
+            app:key="proxy_port"
+            app:summary="The port number of your proxy server"
+            app:iconSpaceReserved="false"
+            app:title="Port" />
+
+        <ListPreference
+            app:key="proxy_type"
+            app:summary="The type of your proxy server"
+            app:iconSpaceReserved="false"
+            app:title="Proxy Type"
+            app:entries="@array/proxy_type"
+            app:entryValues="@array/proxy_type_value" />
+
+        <EditTextPreference
+            app:key="proxy_dns"
+            app:summary="The dns server for proxy service"
+            app:iconSpaceReserved="false"
+            app:title="DNS" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="authentication_settings"
+        app:iconSpaceReserved="false"
+        app:title="Authentication Settings">
+
+        <CheckBoxPreference
+            app:key="auth_enable"
+            app:iconSpaceReserved="false"
+            app:summary="Enable authentication for proxy server"
+            app:title="Enable Authentication" />
+
+        <EditTextPreference
+            app:key="auth_username"
+            app:summary="Proxy's username"
+            app:iconSpaceReserved="false"
+            app:title="Username" />
+
+        <EditTextPreference
+            app:key="auth_password"
+            app:summary="Proxy's password"
+            app:iconSpaceReserved="false"
+            app:title="Password" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="target_settings"
+        app:iconSpaceReserved="false"
+        app:title="Target Settings">
+
+        <CheckBoxPreference
+            app:key="target_global"
+            app:iconSpaceReserved="false"
+            app:summary="Enable the global proxy"
+            app:title="Global Proxy" />
+
+        <Preference
+            app:key="target_apps"
+            app:summary="Select apps for proxying or bypassing"
+            app:iconSpaceReserved="false"
+            app:title="Apps Proxy" />
+
+
+        <CheckBoxPreference
+            app:key="target_bypass_mode"
+            app:summary="Enable this option to bypass selected apps instead of proxying them"
+            app:iconSpaceReserved="false"
+            app:title="Bypass Mode" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
