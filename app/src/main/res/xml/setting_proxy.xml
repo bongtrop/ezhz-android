@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android"
     app:fragment="cc.ggez.ezhz.ui.proxy.ProxyFragment">
 
     <SwitchPreferenceCompat
-        app:key="proxy_switch"
+        app:key="proxy_running"
         app:iconSpaceReserved="false"
         app:summary="Enable / Disable proxy"
         app:title="Proxy Switch" />
-
-
 
     <PreferenceCategory
         app:key="proxy_settings"
@@ -19,24 +17,32 @@
             app:key="proxy_auto"
             app:iconSpaceReserved="false"
             app:summary="Get proxy settings from the PAC file automatically"
-            app:title="Auto Setting" />
+            app:enabled="false"
+            app:title="Auto Proxy with PAC" />
 
         <EditTextPreference
             app:key="proxy_pac_url"
             app:summary="The URL of your PAC file"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:enabled="false"
             app:title="PAC URL" />
 
         <EditTextPreference
             app:key="proxy_host"
             app:summary="The host name of your proxy server"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="127.0.0.1"
             app:title="Host" />
 
         <EditTextPreference
             app:key="proxy_port"
             app:summary="The port number of your proxy server"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="1337"
+            android:inputType="number"
             app:title="Port" />
 
         <ListPreference
@@ -45,12 +51,16 @@
             app:iconSpaceReserved="false"
             app:title="Proxy Type"
             app:entries="@array/proxy_type"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="http"
             app:entryValues="@array/proxy_type_value" />
 
         <EditTextPreference
             app:key="proxy_dns"
             app:summary="The dns server for proxy service"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="1.1.1.1"
             app:title="DNS" />
 
     </PreferenceCategory>
@@ -70,12 +80,16 @@
             app:key="auth_username"
             app:summary="Proxy's username"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:dependency="auth_enable"
             app:title="Username" />
 
         <EditTextPreference
             app:key="auth_password"
             app:summary="Proxy's password"
             app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:dependency="auth_enable"
             app:title="Password" />
 
     </PreferenceCategory>
@@ -89,19 +103,25 @@
             app:key="target_global"
             app:iconSpaceReserved="false"
             app:summary="Enable the global proxy"
+            app:disableDependentsState="true"
+            app:defaultValue="true"
             app:title="Global Proxy" />
+
 
         <Preference
             app:key="target_apps"
             app:summary="Select apps for proxying or bypassing"
             app:iconSpaceReserved="false"
-            app:title="Apps Proxy" />
+            app:dependency="target_global"
+            app:title="Apps Proxy">
+        </Preference>
 
 
         <CheckBoxPreference
             app:key="target_bypass_mode"
             app:summary="Enable this option to bypass selected apps instead of proxying them"
             app:iconSpaceReserved="false"
+            app:dependency="target_global"
             app:title="Bypass Mode" />
 
     </PreferenceCategory>

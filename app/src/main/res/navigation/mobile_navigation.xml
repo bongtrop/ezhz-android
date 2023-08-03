@@ -7,18 +7,18 @@
 
     <fragment
         android:id="@+id/navigation_proxy"
-        android:name="cc.ggez.ezhz.ui.proxy.ProxyFragment"
+        android:name="cc.ggez.ezhz.module.proxy.ProxyFragment"
         android:label="@string/title_proxy" />
 
     <fragment
         android:id="@+id/navigation_frida"
-        android:name="cc.ggez.ezhz.ui.frida.FridaFragment"
+        android:name="cc.ggez.ezhz.module.frida.FridaFragment"
         android:label="@string/title_frida"
         tools:layout="@layout/fragment_frida" />
 
     <fragment
         android:id="@+id/navigation_shared_pref"
-        android:name="cc.ggez.ezhz.ui.sharedpref.SharedPrefFragment"
+        android:name="cc.ggez.ezhz.module.sharedpref.SharedPrefFragment"
         android:label="@string/title_shared_pref"
         tools:layout="@layout/fragment_shared_pref" />
 </navigation>

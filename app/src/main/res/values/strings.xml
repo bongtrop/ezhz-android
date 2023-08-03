@@ -3,7 +3,7 @@
     <string name="title_proxy">Proxy</string>
     <string name="title_frida">Frida</string>
     <string name="title_shared_pref">Shared Preferences</string>
-    <string name="title_activity_app_select">AppSelectActivity</string>
+    <string name="title_activity_app_select">App Select Activity</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -19,4 +19,22 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="tv_app_name">App Name</string>
+    <string name="tv_package_name">package.name</string>
+    <string name="iv_app_icon">App Icon</string>
+    <string name="user">User</string>
+    <string name="system">System</string>
+    <string name="save">Save</string>
+    <string name="reload">Reload</string>
+    <string name="msg_pac_error">Cannot connect to proxy by using PAC URL</string>
+    <string name="msg_resolve_error">Cannot resolve proxy hostname</string>
+    <string name="service_running">The service is running</string>
+    <string name="btn_execute">Execute</string>
+    <string name="btn_kill">Kill</string>
+    <string name="btn_install">Install</string>
+    <string name="btn_uninstall">Uninstall</string>
+    <string name="frida_tag_name">Frida Server v%s</string>
+    <string name="txt_dialog_download_header">Download Frida Server</string>
+    <string name="txt_dialog_download_subtext">This may take a moment.</string>
+    <string name="service_stop">Stop Service</string>
 </resources>
