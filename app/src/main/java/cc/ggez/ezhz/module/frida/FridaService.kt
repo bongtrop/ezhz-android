@@ -8,7 +8,6 @@ import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
 import android.os.IBinder
-import android.telephony.mbms.StreamingService
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import cc.ggez.ezhz.MainActivity
@@ -30,7 +29,7 @@ class FridaService : Service() {
     }
 
     override fun onCreate() {
-        Log.d(TAG, "Service Frida Create");
+        Log.d(TAG, "Service Frida Create")
         super.onCreate()
         fridaServerDir = "${filesDir.absolutePath}/server"
         createNotificationChannel()
@@ -38,7 +37,7 @@ class FridaService : Service() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("menu", "frida")
         pendIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         } else {
             PendingIntent.getActivity(
                 this,
@@ -81,8 +80,8 @@ class FridaService : Service() {
 
     override fun onDestroy() {
         FridaHelper.stopFridaServer()
-        notificationManager.cancelAll();
-        stopForeground(STOP_FOREGROUND_DETACH);
+        notificationManager.cancelAll()
+        stopForeground(STOP_FOREGROUND_DETACH)
         super.onDestroy()
     }
 
