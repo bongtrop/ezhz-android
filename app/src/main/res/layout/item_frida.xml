@@ -31,7 +31,6 @@
                 android:layout_marginStart="12dp"
                 android:text="@{@string/frida_tag_name(frida.tag.name)}"
                 tools:text="Frida Server v1.2.3"
-                android:ellipsize="end"
                 android:maxLines="1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

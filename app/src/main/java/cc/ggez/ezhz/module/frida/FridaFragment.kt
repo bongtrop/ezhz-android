@@ -1,7 +1,5 @@
 package cc.ggez.ezhz.module.frida
 
-import android.app.NotificationManager
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import cc.ggez.ezhz.R
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cc.ggez.ezhz.databinding.DialogDownloadBinding
 import cc.ggez.ezhz.databinding.FragmentFridaBinding
 import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.checkFridaServerProcessTag
@@ -26,6 +24,7 @@ class FridaFragment : Fragment() {
     private val fridaAdapter = FridaAdapter()
     private lateinit var dialogDownloadBinding: DialogDownloadBinding
     private lateinit var dialog: AlertDialog
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,6 +43,12 @@ class FridaFragment : Fragment() {
         builder.setView(dialogDownloadBinding.root)
         dialog = builder.create()
 
+        swipeRefreshLayout = binding.swipeRefreshLayout
+
+        swipeRefreshLayout.setOnRefreshListener {
+            fridaViewModel.getAllFridaItems(true, ::reloadDone)
+            swipeRefreshLayout.isRefreshing = false
+        }
 
         binding.rvFrida.adapter = fridaAdapter
 
@@ -92,9 +97,13 @@ class FridaFragment : Fragment() {
             }
         }
 
-        fridaViewModel.getAllFridaItems(true)
+        fridaViewModel.getAllFridaItems(false, ::reloadDone)
 
         return root
+    }
+
+    fun reloadDone() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onDestroyView() {

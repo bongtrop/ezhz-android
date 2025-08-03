@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.preference.CheckBoxPreference
@@ -30,6 +32,10 @@ class ProxyFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
     private lateinit var proxyPortText: EditTextPreference
     private lateinit var proxyTypeList: ListPreference
     private lateinit var dnsText: EditTextPreference
+    private lateinit var portsText: EditTextPreference
+
+    private lateinit var certificateFilenameText: EditTextPreference
+    private lateinit var certificateBodyText: EditTextPreference
 
     private lateinit var isAuthCheck: CheckBoxPreference
     private lateinit var authUsernameText: EditTextPreference
@@ -62,6 +68,10 @@ class ProxyFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
         proxyPortText = findPreference("proxy_port")!!
         proxyTypeList = findPreference("proxy_type")!!
         dnsText = findPreference("proxy_dns")!!
+        portsText = findPreference("proxy_ports")!!
+
+        certificateFilenameText = findPreference("certificate_filename")!!
+        certificateBodyText = findPreference("certificate_body")!!
 
         isAuthCheck = findPreference("auth_enable")!!
         authUsernameText = findPreference("auth_username")!!
@@ -70,6 +80,12 @@ class ProxyFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
         isTargetGlobalCheck = findPreference("target_global")!!
         targetApps = findPreference("target_apps")!!
         isTargetBypassModeCheck = findPreference("target_bypass_mode")!!
+
+        certificateBodyText.setOnBindEditTextListener {
+            it.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+            it.setMinLines(10)
+            it.setGravity(Gravity.TOP or Gravity.START)
+        }
 
         // App select
         targetApps.setOnPreferenceClickListener {
@@ -141,6 +157,10 @@ class ProxyFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
         proxyPortText.isEnabled = false
         proxyTypeList.isEnabled = false
         dnsText.isEnabled = false
+        portsText.isEnabled = false
+
+        certificateFilenameText.isEnabled = false
+        certificateBodyText.isEnabled = false
 
         isAuthCheck.isEnabled = false
         authUsernameText.isEnabled = false
@@ -158,6 +178,10 @@ class ProxyFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
         proxyPortText.isEnabled = true
         proxyTypeList.isEnabled = true
         dnsText.isEnabled = true
+        portsText.isEnabled = true
+
+        certificateFilenameText.isEnabled = true
+        certificateBodyText.isEnabled = true
 
         isAuthCheck.isEnabled = true
         authUsernameText.isEnabled = true

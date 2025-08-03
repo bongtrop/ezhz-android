@@ -9,14 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.checkFridaServerProcessTag
 import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.getDownloadedFridaTags
 import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.removeFridaServer
-import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.startFridaServer
 import cc.ggez.ezhz.module.frida.helper.FridaHelper.Companion.stopFridaServer
 import cc.ggez.ezhz.module.frida.helper.GithubHelper
 import cc.ggez.ezhz.module.frida.model.FridaItem
 import cc.ggez.ezhz.module.frida.model.FridaItemState
-import cc.ggez.ezhz.module.frida.model.GithubRelease
 import cc.ggez.ezhz.module.frida.model.GithubTag
-import cc.ggez.ezhz.module.proxy.ProxyService
 import com.ixuea.android.downloader.DownloadService
 import com.ixuea.android.downloader.callback.DownloadListener
 import com.ixuea.android.downloader.domain.DownloadInfo
@@ -27,7 +24,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-
+import kotlin.reflect.KFunction0
 
 class FridaViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -82,26 +79,44 @@ class FridaViewModel(application: Application) : AndroidViewModel(application) {
                 return@Comparator -1
             }
 
-            return@Comparator b.tag.name.compareTo(a.tag.name)
+            val version1 = b.tag.name
+            val version2 = a.tag.name
+
+            val parts1 = version1.split(".").map { it.toInt() }
+            val parts2 = version2.split(".").map { it.toInt() }
+
+            val maxLen = maxOf(parts1.size, parts2.size)
+
+            for (i in 0 until maxLen) {
+                val p1 = parts1.getOrElse(i) { 0 } // Handle missing parts as 0
+                val p2 = parts2.getOrElse(i) { 0 }
+
+                if (p1 < p2) return@Comparator -1
+                if (p1 > p2) return@Comparator 1
+            }
+
+            return@Comparator 0
         })
     }
 
-    fun getAllFridaItems(forceReload: Boolean = false) {
-        if (forceReload && checkCacheTags()) {
-            val tags = GithubHelper.translateTags(getCacheTags())
-            fridaItemList.postValue(fridaItemsFromTags(tags))
-        } else {
+    fun getAllFridaItems(forceReload: Boolean = false, reloadDone: KFunction0<Unit>) {
+        if (forceReload || !checkCacheTags()) {
             GithubHelper.fetchFridaTags("frida", "frida", 0, object: GithubHelper.GithubTagsCallback {
                 override fun onSuccess(resJson: String) {
                     cacheTags(resJson)
                     val tags = GithubHelper.translateTags(getCacheTags())
                     fridaItemList.postValue(fridaItemsFromTags(tags))
+                    reloadDone()
                 }
 
                 override fun onFailure(e: IOException) {
                     errorMessage.postValue(e.message)
+                    reloadDone()
                 }
             })
+        } else {
+            val tags = GithubHelper.translateTags(getCacheTags())
+            fridaItemList.postValue(fridaItemsFromTags(tags))
         }
     }
 
@@ -148,7 +163,7 @@ class FridaViewModel(application: Application) : AndroidViewModel(application) {
             override fun onSuccess(resJson: String) {
                 val release = GithubHelper.translateRelease(resJson)
                 val downloadUrl = GithubHelper.downloadUrlFromRelease(release)
-                Log.d(TAG, "[+] Download Start ${downloadUrl}")
+                Log.d(TAG, "[+] Download Start $downloadUrl")
                 val downloadInfo = DownloadInfo.Builder().setUrl(downloadUrl)
                     .setPath("${cacheDir.absolutePath}/frida-server-${fridaItem.tag.name}.xz")
                     .build()

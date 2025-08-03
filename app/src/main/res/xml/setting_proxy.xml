@@ -63,6 +63,33 @@
             app:defaultValue="1.1.1.1"
             app:title="DNS" />
 
+        <EditTextPreference
+            app:key="proxy_ports"
+            app:summary="The intercepted ports for proxy service"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="443,8443,5228"
+            app:title="Intercepted Ports" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="authentication_settings"
+        app:iconSpaceReserved="false"
+        app:title="MitM Certificate">
+        <EditTextPreference
+            app:key="certificate_filename"
+            app:summary="The certificate filename of MitM tools"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="9a5ba575.0"
+            app:title="Filename" />
+        <EditTextPreference
+            app:key="certificate_body"
+            app:summary="The certificate body of MitM tools"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:title="Content" />
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -20,6 +20,7 @@ import cc.ggez.ezhz.MainActivity
 import cc.ggez.ezhz.R
 import cc.ggez.ezhz.module.frida.FridaService
 import com.topjohnwu.superuser.Shell
+import java.io.File
 import java.lang.ref.WeakReference
 
 class ProxyService : Service() {
@@ -35,6 +36,9 @@ class ProxyService : Service() {
         private const val MSG_CONNECT_RESOLVE_ERROR = 5
 
         const val CMD_IPTABLES_RETURN = "iptables -t nat -A OUTPUT -p tcp -d 0.0.0.0 -j RETURN\n"
+
+        const val CMD_IPTABLES_REDIRECT_ADD_HTTP_TEMPLATE = "iptables -t nat -A OUTPUT -p PROTOCOL --dport SOURCE_PORT -j REDIRECT --to DEST_PORT\n"
+        const val CMD_IPTABLES_DNAT_ADD_HTTP_TEMPLATE = "iptables -t nat -A OUTPUT -p PROTOCOL --dport SOURCE_PORT -j DNAT --to-destination 127.0.0.1:DEST_PORT\n"
 
         const val CMD_IPTABLES_REDIRECT_ADD_HTTP =
             ("iptables -t nat -A OUTPUT -p tcp --dport 80 -j REDIRECT --to 8123\n"
@@ -60,6 +64,48 @@ class ProxyService : Service() {
         const val CMD_IPTABLES_DNAT_ADD_SOCKS =
             "iptables -t nat -A OUTPUT -p tcp -j DNAT --to-destination 127.0.0.1:8123\n"
 
+        val CMD_INJECT_SYSTEM_CERTIFICATE = """
+            mkdir -p -m 700 /data/local/tmp/tmp-ca-copy
+            
+            cp /apex/com.android.conscrypt/cacerts/* /data/local/tmp/tmp-ca-copy/
+            
+            mount -t tmpfs tmpfs /system/etc/security/cacerts
+            
+            mv /data/local/tmp/tmp-ca-copy/* /system/etc/security/cacerts/
+            
+            cp CERTIFICATE_PATH /system/etc/security/cacerts/
+            
+            chown root:root /system/etc/security/cacerts/*
+            chmod 644 /system/etc/security/cacerts/*
+            chcon u:object_r:system_file:s0 /system/etc/security/cacerts/*
+            
+            ZYGOTE_PID=${'$'}(pidof zygote || true)
+            ZYGOTE64_PID=${'$'}(pidof zygote64 || true)
+            
+            for Z_PID in "${'$'}ZYGOTE_PID" "${'$'}ZYGOTE64_PID"; do
+                if [ -n "${'$'}Z_PID" ]; then
+                    nsenter --mount=/proc/${'$'}Z_PID/ns/mnt -- \
+                        /bin/mount --bind /system/etc/security/cacerts /apex/com.android.conscrypt/cacerts
+                fi
+            done
+            
+            
+            APP_PIDS=${'$'}(
+                echo "${'$'}ZYGOTE_PID ${'$'}ZYGOTE64_PID" | \
+                xargs -n1 ps -o 'PID' -P | \
+                grep -v PID
+            )
+            
+            for PID in ${'$'}APP_PIDS; do
+                nsenter --mount=/proc/${'$'}PID/ns/mnt -- \
+                    /bin/mount --bind /system/etc/security/cacerts /apex/com.android.conscrypt/cacerts
+            done
+            
+            rm -r /data/local/tmp/tmp-ca-copy
+            
+            echo "System certificate injected"
+        """.trimIndent()
+
         private var sRunningInstance: WeakReference<ProxyService>? = null
         fun isServiceStarted(): Boolean {
             val isServiceStarted: Boolean
@@ -72,6 +118,24 @@ class ProxyService : Service() {
                 isServiceStarted = true
             }
             return isServiceStarted
+        }
+
+        fun generateIptableRedirect(ports: List<String>): String {
+            val sb = java.lang.StringBuilder()
+            for (port in ports) {
+                sb.append(CMD_IPTABLES_REDIRECT_ADD_HTTP_TEMPLATE.replace("PROTOCOL", "tcp").replace("SOURCE_PORT", port).replace("DEST_PORT", "8123"))
+                sb.append(CMD_IPTABLES_REDIRECT_ADD_HTTP_TEMPLATE.replace("PROTOCOL", "udp").replace("SOURCE_PORT", port).replace("DEST_PORT", "8124"))
+            }
+            return sb.toString()
+        }
+
+        fun generateIptableDnat(ports: List<String>): String {
+            val sb = java.lang.StringBuilder()
+            for (port in ports) {
+                sb.append(CMD_IPTABLES_DNAT_ADD_HTTP_TEMPLATE.replace("PROTOCOL", "tcp").replace("SOURCE_PORT", port).replace("DEST_PORT", "8123"))
+                sb.append(CMD_IPTABLES_DNAT_ADD_HTTP_TEMPLATE.replace("PROTOCOL", "udp").replace("SOURCE_PORT", port).replace("DEST_PORT", "8124"))
+            }
+            return sb.toString()
         }
     }
 
@@ -240,8 +304,8 @@ class ProxyService : Service() {
             val cmd = StringBuilder()
             cmd.append(CMD_IPTABLES_RETURN.replace("0.0.0.0", proxyProfile.host))
 
-            var redirectCmd = CMD_IPTABLES_REDIRECT_ADD_HTTP
-            var dnatCmd = CMD_IPTABLES_DNAT_ADD_HTTP
+            var redirectCmd = generateIptableRedirect(proxyProfile.ports.split(","))
+            var dnatCmd = generateIptableDnat(proxyProfile.ports.split(","))
 
             if (proxyProfile.proxyType.equals("socks4") || proxyProfile.proxyType.equals("socks5")) {
                 redirectCmd = CMD_IPTABLES_REDIRECT_ADD_SOCKS
@@ -277,6 +341,25 @@ class ProxyService : Service() {
             }
 
             Shell.cmd(cmd.toString()).exec()
+
+            // Inject Certificate
+            if (proxyProfile.certificateFilename.isNotEmpty() && proxyProfile.certificateBody.isNotEmpty()) {
+                val certificatePath = "${cacheDir.absolutePath}/${proxyProfile.certificateFilename}"
+                val scriptPath = "${cacheDir.absolutePath}/inject.sh"
+
+                File(certificatePath).writeText(proxyProfile.certificateBody)
+                File(scriptPath).writeText(CMD_INJECT_SYSTEM_CERTIFICATE.replace("CERTIFICATE_PATH", "/data/local/tmp/${proxyProfile.certificateFilename}") + "\n")
+
+                val sb = StringBuilder()
+                sb.append("cp $scriptPath /data/local/tmp\n")
+                sb.append("cp $certificatePath /data/local/tmp\n")
+                sb.append("chown root:root /data/local/tmp/inject.sh\n")
+                sb.append("chmod +x /data/local/tmp/inject.sh\n")
+                sb.append("id -Z\n")
+                sb.append("which nsenter\n")
+                sb.append("/data/local/tmp/inject.sh\n")
+                val result = Shell.cmd(sb.toString()).exec()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error setting up port forward during connect", e)
         }

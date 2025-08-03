@@ -2,7 +2,6 @@ package cc.ggez.ezhz.module.proxy
 
 import com.topjohnwu.superuser.Shell
 
-
 class ProxySingleton {
     companion object {
         var isConnecting = false

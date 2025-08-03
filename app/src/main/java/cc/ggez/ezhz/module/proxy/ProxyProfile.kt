@@ -18,6 +18,10 @@ class ProxyProfile : Serializable {
     var port: Int = 0
     var proxyType: String
     var dns: String
+    var ports: String
+
+    var certificateFilename: String
+    var certificateBody: String
 
     var isAuth: Boolean = false
     var username: String
@@ -39,6 +43,11 @@ class ProxyProfile : Serializable {
             proxyProfile.port = settings.getString("proxy_port", "1337").toString().toInt()
             proxyProfile.proxyType = settings.getString("proxy_type", "http").toString()
             proxyProfile.dns = settings.getString("proxy_dns", "1.1.1.1").toString()
+            proxyProfile.ports = settings.getString("proxy_ports", "443,8443,5228").toString()
+
+            proxyProfile.certificateFilename = settings.getString("certificate_filename", "").toString()
+            proxyProfile.certificateBody = settings.getString("certificate_body", "").toString()
+
             proxyProfile.isAuth = settings.getBoolean("auth_enable", false)
             proxyProfile.username = settings.getString("auth_username", "").toString()
             proxyProfile.password = settings.getString("auth_password", "").toString()
@@ -61,6 +70,10 @@ class ProxyProfile : Serializable {
             proxyProfile.port = bundle.getInt("proxy_port", 1337)
             proxyProfile.proxyType = bundle.getString("proxy_type", "http").toString()
             proxyProfile.dns = bundle.getString("proxy_dns", "1.1.1.1").toString()
+            proxyProfile.ports = bundle.getString("proxy_ports", "443,8443,5228").toString()
+
+            proxyProfile.certificateFilename = bundle.getString("certificate_filename", "").toString()
+            proxyProfile.certificateBody = bundle.getString("certificate_body", "").toString()
 
             proxyProfile.isAuth = bundle.getBoolean("auth_enable", false)
             proxyProfile.username = bundle.getString("auth_username", "").toString()
@@ -132,6 +145,10 @@ class ProxyProfile : Serializable {
         port = 1337
         proxyType = "http"
         dns = "1.1.1.1"
+        ports = "443,8443,5228"
+
+        certificateFilename = ""
+        certificateBody = ""
 
         isAuth = false
         username = ""
@@ -153,6 +170,10 @@ class ProxyProfile : Serializable {
         bundle.putInt("proxy_port", port)
         bundle.putString("proxy_type", proxyType)
         bundle.putString("proxy_dns", dns)
+        bundle.putString("proxy_ports", ports)
+
+        bundle.putString("certificate_filename", certificateFilename)
+        bundle.putString("certificate_body", certificateBody)
 
         bundle.putBoolean("auth_enable", isAuth)
         bundle.putString("auth_username", username)
@@ -176,6 +197,10 @@ class ProxyProfile : Serializable {
         ed.putString("proxy_port", port.toString())
         ed.putString("proxy_type", proxyType)
         ed.putString("proxy_dns", dns)
+        ed.putString("proxy_ports", ports)
+
+        ed.putString("certificate_filename", certificateFilename)
+        ed.putString("certificate_body", certificateBody)
 
         ed.putBoolean("auth_enable", isAuth)
         ed.putString("auth_username", username)
@@ -202,6 +227,10 @@ class ProxyProfile : Serializable {
         obj.put("proxy_port", port)
         obj.put("proxy_type", proxyType)
         obj.put("proxy_dns", dns)
+        obj.put("proxy_ports", ports)
+
+        obj.put("certificate_filename", certificateFilename)
+        obj.put("certificate_body", certificateBody)
 
         obj.put("auth_enable", isAuth)
         obj.put("auth_username", username)

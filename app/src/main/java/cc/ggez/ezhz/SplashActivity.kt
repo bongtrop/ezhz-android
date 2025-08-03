@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.ixuea.android.downloader.BuildConfig
 import com.topjohnwu.superuser.Shell
 import java.io.FileOutputStream
 import java.io.IOException
@@ -22,7 +22,12 @@ import java.io.OutputStream
 class SplashActivity : AppCompatActivity() {
     companion object {
         init {
-            Shell.enableVerboseLogging = true
+            Shell.enableVerboseLogging = BuildConfig.DEBUG
+            Shell.setDefaultBuilder(
+                Shell.Builder.create()
+                    .setFlags(Shell.FLAG_MOUNT_MASTER)
+                    .setTimeout(10)
+            )
         }
     }
 
@@ -101,8 +106,9 @@ class SplashActivity : AppCompatActivity() {
         if (files != null) {
             for (file in files) {
                 try {
+                    val outFilePath = "${filesDir.absolutePath}/${file}"
                     val inFile = assetManager.open("${arch}/$file")
-                    val outFile = FileOutputStream("${filesDir.absolutePath}/${file}")
+                    val outFile = FileOutputStream(outFilePath)
                     copyFile(inFile, outFile)
                     inFile.close()
                     outFile.flush()
